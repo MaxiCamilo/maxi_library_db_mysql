@@ -163,8 +163,12 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
   }
 
   @override
-  Future<void> deleteTableDirectly({required String tableName}) {
-    return _executePackage(package: MysqlCommandPackage(commandText: 'DROP TABLE `$tableName`'));
+  Future<void> deleteTableDirectly({required String tableName}) async {
+    if (!await checkTableExistsDirectly(tableName: tableName)) {
+      return;
+    }
+
+    return await _executePackage(package: MysqlCommandPackage(commandText: 'DROP TABLE `$tableName`'));
   }
 
   @override
@@ -205,7 +209,7 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
   @override
   Future<void> createDatabase({required String databaseName, bool omitIfExists = true}) async {
     if (connectWithDatabaseSelected) {
-      return MysqlDatabaseEngine(configuration: configuration, connectWithDatabaseSelected: false).deleteDatabase(databaseName: databaseName);
+      return MysqlDatabaseEngine(configuration: configuration, connectWithDatabaseSelected: false).createDatabase(databaseName: databaseName);
     }
 
     if (await checkDatabaseExists(databaseName: databaseName)) {
@@ -271,6 +275,10 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
 
     final (commandText, values) = package.buildCommand();
     try {
+      await Future.delayed(Duration.zero); //<--- Sometimes, a close request must be processed
+      if (!_instance!.connected) {
+        await _instance!.connect();
+      }
       await _instance!.execute(commandText, values);
     } catch (ex) {
       throw NegativeResult(
@@ -284,8 +292,14 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
     checkProgrammingFailure(thatChecks: () => tr('The database instance was created previously'), result: () => _instance != null);
 
     final (commandText, values) = package.buildCommand();
+    log(commandText);
     late final IResultSet result;
     try {
+      await Future.delayed(Duration.zero); //<--- Sometimes, a close request must be processed
+      if (!_instance!.connected) {
+        await _instance!.connect();
+      }
+
       result = await _instance!.execute(commandText, values);
     } catch (ex) {
       throw NegativeResult(

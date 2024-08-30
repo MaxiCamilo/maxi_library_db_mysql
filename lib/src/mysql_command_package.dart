@@ -76,7 +76,7 @@ class MysqlCommandPackage {
   }
 
   (String, Map<String, dynamic>) buildCommand() {
-    final newMap = <String, dynamic>{};
+    final newMap = Map<String, dynamic>.of(shieldedMapedValues);
     String newCommandText = commandText;
 
     for (int i = 0; i < shieldedFixedValues.length; i++) {
@@ -90,7 +90,7 @@ class MysqlCommandPackage {
       }
 
       final newName = 'fix_$i';
-      newCommandText = newCommandText.replaceTextFromPosition(start: position, newText: ':$newName');
+      newCommandText = newCommandText.replaceTextFromPosition(start: position, newText: ':$newName', skipLength: 1);
       newMap[newName] = value;
     }
     return (newCommandText, newMap);

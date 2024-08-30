@@ -17,5 +17,6 @@ void main() {
     test('Generate reflectors test', () async {
       await BuildReflectors.makeFilesReflection(mainFileDirection: 'test/models/reflector_test.dart');
     });
+    
   });
 }

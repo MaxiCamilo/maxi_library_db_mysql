@@ -23,7 +23,11 @@ class MysqlDatabaseConfiguration with IDataBaseConfiguration {
   int openConnectionSeconds = 30;
 
   @override
-  IDataBaseEngine generateEngine() {
+  MysqlDatabaseEngine generateEngine() {
     return MysqlDatabaseEngine(configuration: this, connectWithDatabaseSelected: true);
+  }
+
+  MysqlDatabaseEngine generateEngineWithoutAssignedDatabase() {
+    return MysqlDatabaseEngine(configuration: this, connectWithDatabaseSelected: false);
   }
 }

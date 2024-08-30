@@ -16,7 +16,9 @@ mixin ConditionCommandAdapterMysql {
 
   //Ex: name = 'Maxi' (or shieldValue == true: name = ?)
   static MysqlCommandPackage _convertCompareValue(CompareValue command) {
-    final generalCommandText = '`${command.originField}` ${convertConditionCompareToText(command.typeComparation)} ';
+    String generalCommandText = command.selectedTable.isNotEmpty ? '`${command.selectedTable}`.`${command.originField}`' : '`${command.originField}`';
+
+    generalCommandText += ' ${convertConditionCompareToText(command.typeComparation)} ';
 
     if (command.shieldValue) {
       return MysqlCommandPackage(commandText: '$generalCommandText ?', shieldedFixedValues: [command.value]);
@@ -27,16 +29,26 @@ mixin ConditionCommandAdapterMysql {
   }
 
   static MysqlCommandPackage _convertField(CompareFields command) {
-    return MysqlCommandPackage(commandText: '`${command.originField}` ${convertConditionCompareToText(command.typeComparation)} `${command.compareField}`');
+    String generalCommandText = command.originFieldTable.isNotEmpty ? '`${command.originFieldTable}`.`${command.originField}`' : '`${command.originField}`';
+    generalCommandText += ' ${convertConditionCompareToText(command.typeComparation)} ';
+    generalCommandText += command.compareFieldTable.isNotEmpty ? '`${command.compareFieldTable}`.`${command.compareField}`' : '`${command.compareField}`';
+
+    return MysqlCommandPackage(commandText: generalCommandText);
   }
 
   static MysqlCommandPackage _convertIncludeValues(CompareIncludesValues command) {
     final buffer = StringBuffer();
 
-    if (command.isInclusive) {
-      buffer.write('IN (');
+    if (command.selectedTable.isNotEmpty) {
+      buffer.write('`${command.selectedTable}`.`${command.fieldName}`');
     } else {
-      buffer.write('NOT IN (');
+      buffer.write('`${command.fieldName}`');
+    }
+
+    if (command.isInclusive) {
+      buffer.write(' IN (');
+    } else {
+      buffer.write(' NOT IN (');
     }
 
     if (command.shieldValue) {
@@ -86,7 +98,7 @@ mixin ConditionCommandAdapterMysql {
   }
 
   static MysqlCommandPackage _convertSimilarText(CompareSimilarText command) {
-    String commandText = '`${command.fieldName}` LIKE';
+    String commandText = command.selectedTable.isNotEmpty ? '`${command.selectedTable}`.`${command.fieldName}` LIKE' : '`${command.fieldName}` LIKE';
     String searchedText = command.similarText.trim();
 
     if (searchedText.first == '%') {

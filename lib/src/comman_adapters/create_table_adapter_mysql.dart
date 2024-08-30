@@ -6,23 +6,24 @@ import 'package:maxi_library_db_mysql/src/mysql_command_package.dart';
 
 mixin CreateTableAdapterMysql {
   static MysqlCommandPackage convertToPackage({required CreateTableCommand command}) {
-    final buffer = StringBuffer('CREATE TABLE `${command.name}` (\n');
+    String commandText = 'CREATE TABLE `${command.name}` (\n';
+    final parts = <String>[];
 
     for (final col in command.columns) {
-      buffer.write(' `${col.nameColumn}` ${_convertColumnType(col.type)} NOT NULL');
+      String text = ' `${col.nameColumn}` ${_convertColumnType(col.type)} NOT NULL';
       if (col.isPrimaryKey && col.isAutoIncrement) {
-        buffer.write(' AUTOINCREMENT');
+        text += ' AUTO_INCREMENT';
       }
 
-      buffer.write(', \n');
+      parts.add(text);
     }
 
     for (final pri in command.columns.where((x) => x.isPrimaryKey)) {
-      buffer.write(' PRIMARY KEY (`${pri.nameColumn}`)\n');
+      parts.add(' PRIMARY KEY (`${pri.nameColumn}`)');
     }
 
     for (final uni in command.columns.where((x) => x.isUniqueKey)) {
-      buffer.write(' UNIQUE (`${uni.nameColumn}`)\n');
+      parts.add(' UNIQUE (`${uni.nameColumn}`)');
     }
 
     for (final pri in command.primaryKeyGroups) {
@@ -30,7 +31,7 @@ mixin CreateTableAdapterMysql {
         continue;
       }
 
-      buffer.write(' PRIMARY KEY (${TextUtilities.generateCommand(list: pri.map((x) => '`$x`'))})\n');
+      parts.add(' PRIMARY KEY (${TextUtilities.generateCommand(list: pri.map((x) => '`$x`'))})');
     }
 
     for (final uni in command.uniqueKeyGroups) {
@@ -38,18 +39,19 @@ mixin CreateTableAdapterMysql {
         continue;
       }
 
-      buffer.write(' UNIQUE (${TextUtilities.generateCommand(list: uni.map((x) => '`$x`'))})\n');
+      parts.add(' UNIQUE (${TextUtilities.generateCommand(list: uni.map((x) => '`$x`'))})');
     }
 
     for (final fore in command.foreignKeys) {
-      buffer.write(' FOREIGN KEY(`${fore.fieldName}`) REFERENCES `${fore.tableName}`(`${fore.referenceFieldName}`)\n');
+      parts.add(' FOREIGN KEY(`${fore.fieldName}`) REFERENCES `${fore.tableName}`(`${fore.referenceFieldName}`)\n');
     }
 
-    buffer.write(');');
+    commandText += TextUtilities.generateCommand(list: parts, character: ',\n');
+    commandText += ');';
 
-    log(buffer.toString());
+    log(commandText);
 
-    return MysqlCommandPackage(commandText: buffer.toString());
+    return MysqlCommandPackage(commandText: commandText);
   }
 
   static String _convertColumnType(ColumnAttributesType type) {
