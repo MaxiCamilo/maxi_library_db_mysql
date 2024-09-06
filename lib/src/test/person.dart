@@ -1,8 +1,7 @@
 import 'package:maxi_library/maxi_library.dart';
 
-import 'reflector_test.dart';
 
-@reflector
+@reflect
 class Person {
   @PrimaryKey()
   @CheckNumberRange(minimum: 0,maximum: 999)

@@ -1,8 +1,8 @@
 import 'package:maxi_library/maxi_library.dart';
 import 'package:maxi_library_db/maxi_library_db.dart';
-import 'package:maxi_library_db_mysql/src/reflection/reflection_implementation.dart';
+import 'package:maxi_library_db_mysql/maxi_library_db_mysql.dart';
 
-@reflectByMaxiLibraryDbMysql
+@reflect
 class MysqlDatabaseConfiguration with IDataBaseConfiguration {
   @CheckIp()
   String host = '127.0.0.1';

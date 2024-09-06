@@ -7,16 +7,8 @@ import 'dart:developer';
 import 'package:maxi_library/maxi_library.dart';
 import 'package:maxi_library_db/maxi_library_db.dart';
 import 'package:maxi_library_db_mysql/maxi_library_db_mysql.dart';
-import 'package:maxi_library_db_mysql/src/reflection/maxi_library_db_mysql_reflector.dart';
+import 'package:maxi_library_db_mysql/src/reflection/maxilibrarydbmysql.dart';
 import 'package:test/test.dart';
-
-import 'models/maxi_library_db_mysql_test_reflector.dart';
-
-class _ReflectorsCatalog extends ReflectorsCatalog {
-  @override
-  List<ReflectorInstance> get instances => const [MaxiLibraryDbMysqlReflector(), MaxiLibraryDbMysqlTestReflector()];
-  const _ReflectorsCatalog();
-}
 
 void main() {
   final database = MysqlDatabaseConfiguration()
@@ -26,7 +18,15 @@ void main() {
 
   group('A group of tests', () {
     setUp(() {
-      _ReflectorsCatalog().initializeReflectable();
+      ReflectionManager.defineAlbums = [maxiLibraryDbReflectors, maxiLibraryDbMysqlReflectors];
+      ReflectionManager.defineAsTheMainReflector();
+    });
+
+    test('Test reflection', () {
+      final jsonText = ReflectionManager.getReflectionEntity(MysqlDatabaseConfiguration).serializeToJson(value: database);
+      final newObject = ReflectionManager.getReflectionEntity(MysqlDatabaseConfiguration).interpretationFromJson(rawJson: jsonText);
+
+      log(ReflectionManager.getReflectionEntity(MysqlDatabaseConfiguration).serializeToJson(value: newObject));
     });
 
     test('test engine initialization', () async {

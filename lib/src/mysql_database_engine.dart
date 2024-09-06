@@ -3,16 +3,16 @@ import 'dart:developer';
 
 import 'package:maxi_library/maxi_library.dart';
 import 'package:maxi_library_db/maxi_library_db.dart';
+import 'package:maxi_library_db_mysql/maxi_library_db_mysql.dart';
 import 'package:maxi_library_db_mysql/src/comman_adapters/aggregator_command_adapter_mysql.dart';
 import 'package:maxi_library_db_mysql/src/comman_adapters/create_table_adapter_mysql.dart';
 import 'package:maxi_library_db_mysql/src/comman_adapters/delete_command_adapter_mysql.dart';
 import 'package:maxi_library_db_mysql/src/comman_adapters/modifier_command_adapter_mysql.dart';
 import 'package:maxi_library_db_mysql/src/comman_adapters/query_command_adapter_mysql.dart';
 import 'package:maxi_library_db_mysql/src/mysql_command_package.dart';
-import 'package:maxi_library_db_mysql/src/reflection/reflection_implementation.dart';
 import 'package:mysql_client/mysql_client.dart';
 
-@reflectByMaxiLibraryDbMysql
+@reflect
 class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngine {
   final MysqlDatabaseConfiguration configuration;
   final bool connectWithDatabaseSelected;
