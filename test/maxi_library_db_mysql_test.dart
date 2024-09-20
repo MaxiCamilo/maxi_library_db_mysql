@@ -24,7 +24,7 @@ void main() {
 
     test('Test reflection', () {
       final jsonText = ReflectionManager.getReflectionEntity(MysqlDatabaseConfiguration).serializeToJson(value: database);
-      final newObject = ReflectionManager.getReflectionEntity(MysqlDatabaseConfiguration).interpretationFromJson(rawJson: jsonText);
+      final newObject = ReflectionManager.getReflectionEntity(MysqlDatabaseConfiguration).interpretationFromJson(rawJson: jsonText, tryToCorrectNames: false);
 
       log(ReflectionManager.getReflectionEntity(MysqlDatabaseConfiguration).serializeToJson(value: newObject));
     });
