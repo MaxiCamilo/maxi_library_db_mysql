@@ -85,7 +85,7 @@ class MysqlCommandPackage {
       if (position == -1) {
         throw NegativeResult(
           identifier: NegativeResultCodes.implementationFailure,
-          message: trc('It is not possible to build the command, position %1 of a fixed value is missing', [i + 1]),
+          message: tr('It is not possible to build the command, position %1 of a fixed value is missing', [i + 1]),
         );
       }
 
