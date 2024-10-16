@@ -1,5 +1,4 @@
 import 'package:maxi_library/maxi_library.dart';
-import 'package:maxi_library_db/maxi_library_db.dart';
 import 'package:maxi_library_db_mysql/src/mysql_command_package.dart';
 
 mixin ConditionCommandAdapterMysql {
