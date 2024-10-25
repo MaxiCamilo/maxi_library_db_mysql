@@ -10,7 +10,7 @@ mixin CreateTableAdapterMysql {
     final parts = <String>[];
 
     for (final col in command.columns) {
-      String text = ' `${col.nameColumn}` ${_convertColumnType(col.type)} NOT NULL';
+      String text = ' `${col.nameColumn}` ${_convertColumnType(col.columnType)} NOT NULL';
       if (col.isPrimaryKey && col.isAutoIncrement) {
         text += ' AUTO_INCREMENT';
       }

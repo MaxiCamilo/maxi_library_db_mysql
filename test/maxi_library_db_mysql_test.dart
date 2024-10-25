@@ -18,7 +18,7 @@ void main() {
 
   group('A group of tests', () {
     setUp(() {
-      ReflectionManager.defineAlbums = [maxiLibraryDbReflectors, maxiLibraryDbMysqlReflectors];
+      ReflectionManager.defineAlbums = [maxiLibraryDbMysqlReflectors];
       ReflectionManager.defineAsTheMainReflector();
     });
 
@@ -41,17 +41,20 @@ void main() {
         columns: [
           ColumnAttributes(
             nameColumn: 'id',
-            type: ColumnAttributesType.intWithoutLimit,
+            columnType: ColumnAttributesType.intWithoutLimit,
             isPrimaryKey: true,
             isAutoIncrement: true,
+            valueAdapter: TypePrimitiveReflection(annotations: [], type: int),
           ),
           ColumnAttributes(
             nameColumn: 'name',
-            type: ColumnAttributesType.text,
+            columnType: ColumnAttributesType.text,
+            valueAdapter: TypePrimitiveReflection(annotations: [], type: String),
           ),
           ColumnAttributes(
             nameColumn: 'isNice',
-            type: ColumnAttributesType.boolean,
+            columnType: ColumnAttributesType.boolean,
+            valueAdapter: TypePrimitiveReflection(annotations: [], type: bool),
           ),
         ],
         primaryKeyGroups: [],
@@ -73,11 +76,13 @@ void main() {
         columns: [
           ColumnAttributes(
             nameColumn: 'id_reference',
-            type: ColumnAttributesType.intWithoutLimit,
+            columnType: ColumnAttributesType.intWithoutLimit,
+            valueAdapter: TypePrimitiveReflection(annotations: [], type: int),
           ),
           ColumnAttributes(
             nameColumn: 'reference_text',
-            type: ColumnAttributesType.text,
+            columnType: ColumnAttributesType.text,
+            valueAdapter: TypePrimitiveReflection(annotations: [], type: String),
           ),
         ],
         primaryKeyGroups: [
