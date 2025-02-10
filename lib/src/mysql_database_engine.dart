@@ -58,7 +58,7 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
     _databaseShutdownWaiter = null;
     if (_instance != null) {
       await containErrorLogAsync(
-          detail: tr('Close a MariaDB/MySQL Database'),
+          detail: Oration(message: 'Close a MariaDB/MySQL Database'),
           function: () async {
             try {
               await _instance!.close();
@@ -81,7 +81,7 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
 
   @override
   Future<void> commitTransaction() async {
-    checkProgrammingFailure(thatChecks: tr('The database instance is in a transaction'), result: () => _inTransaction);
+    checkProgrammingFailure(thatChecks: Oration(message: 'The database instance is in a transaction'), result: () => _inTransaction);
 
     await _executePackage(package: MysqlCommandPackage(commandText: 'COMMIT;'));
     _inTransaction = false;
@@ -101,7 +101,7 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
     if (!connectWithDatabaseSelected) {
       throw NegativeResult(
         identifier: NegativeResultCodes.contextInvalidFunctionality,
-        message: tr('To proceed with the command, it is a prerequisite that a database be selected beforehand'),
+        message: Oration(message: 'To proceed with the command, it is a prerequisite that a database be selected beforehand'),
       );
     }
   }
@@ -124,7 +124,7 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
       if (await checkTableExistsDirectly(tableName: command.name)) {
         throw NegativeResult(
           identifier: NegativeResultCodes.contextInvalidFunctionality,
-          message: tr('The %1 table is already defined', [command.name]),
+          message: Oration(message: 'The %1 table is already defined', textParts: [command.name]),
         );
       }
 
@@ -134,13 +134,13 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
     if (command is QueryCommand) {
       throw NegativeResult(
         identifier: NegativeResultCodes.implementationFailure,
-        message: tr('A query command was attempted to be executed within a direct command function'),
+        message: Oration(message: 'A query command was attempted to be executed within a direct command function'),
       );
     }
 
     throw NegativeResult(
       identifier: NegativeResultCodes.implementationFailure,
-      message: tr('Command type %1 is unknown for the MariaDB/MySQL engine', [command.runtimeType.toString()]),
+      message: Oration(message: 'Command type %1 is unknown for the MariaDB/MySQL engine', textParts: [command.runtimeType.toString()]),
     );
   }
 
@@ -178,7 +178,7 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
     if (!await checkTableExists(tableName: tableName)) {
       throw NegativeResult(
         identifier: NegativeResultCodes.nonExistent,
-        message: tr('Table %1 cannot be found', [tableName]),
+        message: Oration(message: 'Table %1 cannot be found', textParts: [tableName]),
       );
     }
 
@@ -188,8 +188,8 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
     );
 
     final table = await _executeQueryPackage(package: command);
-    checkProgrammingFailure(thatChecks: tr('Query to table %1 returned a non-empty result', [tableName]), result: () => table.isNotEmpty);
-    checkProgrammingFailure(thatChecks: tr('Query to table %1 returned 1 column (1 == %2)', [tableName, table.columnsName.length]), result: () => table.columnsName.length == 1);
+    checkProgrammingFailure(thatChecks: Oration(message: 'Query to table %1 returned a non-empty result', textParts: [tableName]), result: () => table.isNotEmpty);
+    checkProgrammingFailure(thatChecks: Oration(message: 'Query to table %1 returned 1 column (1 == %2)', textParts: [tableName, table.columnsName.length]), result: () => table.columnsName.length == 1);
 
     return table.getColumnContentByPosition(position: 0).cast<String>();
   }
@@ -216,7 +216,7 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
       if (!omitIfExists) {
         throw NegativeResult(
           identifier: NegativeResultCodes.contextInvalidFunctionality,
-          message: tr('The database named %1 already exist', [databaseName]),
+          message: Oration(message: 'The database named %1 already exist', textParts: [databaseName]),
         );
       }
       return;
@@ -271,7 +271,7 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
   }
 
   Future<void> _executePackage({required MysqlCommandPackage package}) async {
-    checkProgrammingFailure(thatChecks: tr('The database instance was created previously'), result: () => _instance != null);
+    checkProgrammingFailure(thatChecks: Oration(message: 'The database instance was created previously'), result: () => _instance != null);
 
     final (commandText, values) = package.buildCommand();
     try {
@@ -283,13 +283,13 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
     } catch (ex) {
       throw NegativeResult(
         identifier: NegativeResultCodes.externalFault,
-        message: tr('A database error occurred while processing a request. The specific error message is: %1', [ex]),
+        message: Oration(message: 'A database error occurred while processing a request. The specific error message is: %1', textParts: [ex]),
       );
     }
   }
 
   Future<TableResult> _executeQueryPackage({required MysqlCommandPackage package}) async {
-    checkProgrammingFailure(thatChecks: tr('The database instance was created previously'), result: () => _instance != null);
+    checkProgrammingFailure(thatChecks: Oration(message: 'The database instance was created previously'), result: () => _instance != null);
 
     final (commandText, values) = package.buildCommand();
     log(commandText);
@@ -304,7 +304,7 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
     } catch (ex) {
       throw NegativeResult(
         identifier: NegativeResultCodes.externalFault,
-        message: tr('A database error occurred while processing a request. The specific error message is: %1', [ex]),
+        message: Oration(message: 'A database error occurred while processing a request. The specific error message is: %1', textParts: [ex]),
       );
     }
 
@@ -329,7 +329,7 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
     } catch (ex) {
       throw NegativeResult(
         identifier: NegativeResultCodes.externalFault,
-        message: tr('An attempt was made to open an MariaDB/MySQL, but an error occurred: %1', [ex.toString()]),
+        message: Oration(message: 'An attempt was made to open an MariaDB/MySQL, but an error occurred: %1', textParts: [ex.toString()]),
         cause: ex,
       );
     }
