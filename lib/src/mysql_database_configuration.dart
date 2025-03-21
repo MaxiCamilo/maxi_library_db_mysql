@@ -23,11 +23,27 @@ class MysqlDatabaseConfiguration with IDataBaseConfiguration {
   int openConnectionSeconds = 30;
 
   @override
-  MysqlDatabaseEngine generateEngine() {
-    return MysqlDatabaseEngine(configuration: this, connectWithDatabaseSelected: true);
+  MysqlDatabaseEngine generateEngine({
+    List<ISemaphore> synchronizerSemaphores = const [],
+    List<ISemaphore> lockersSemaphores = const [],
+  }) {
+    return MysqlDatabaseEngine(
+      configuration: this,
+      connectWithDatabaseSelected: true,
+      synchronizerSemaphores: synchronizerSemaphores,
+      lockersSemaphores: lockersSemaphores,
+    );
   }
 
-  MysqlDatabaseEngine generateEngineWithoutAssignedDatabase() {
-    return MysqlDatabaseEngine(configuration: this, connectWithDatabaseSelected: false);
+  MysqlDatabaseEngine generateEngineWithoutAssignedDatabase({
+    List<ISemaphore> synchronizerSemaphores = const [],
+    List<ISemaphore> lockersSemaphores = const [],
+  }) {
+    return MysqlDatabaseEngine(
+      configuration: this,
+      connectWithDatabaseSelected: false,
+      synchronizerSemaphores: synchronizerSemaphores,
+      lockersSemaphores: lockersSemaphores,
+    );
   }
 }

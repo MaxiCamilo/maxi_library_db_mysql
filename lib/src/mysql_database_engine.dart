@@ -17,7 +17,12 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
   final MysqlDatabaseConfiguration configuration;
   final bool connectWithDatabaseSelected;
 
-  MysqlDatabaseEngine({required this.configuration, this.connectWithDatabaseSelected = true});
+  MysqlDatabaseEngine({
+    required this.configuration,
+    this.connectWithDatabaseSelected = true,
+    super.synchronizerSemaphores = const [],
+    super.lockersSemaphores = const [],
+  });
 
   @override
   bool get inTransaction => _inTransaction;
@@ -333,5 +338,15 @@ class MysqlDatabaseEngine extends DataBaseEngineTemplate with IMultiDatabaseEngi
         cause: ex,
       );
     }
+  }
+
+  @override
+  Future<void> closeDatabasePermanently([FutureOr<void> Function()? reservedFunction]) async {
+    return internalReserveEngine(function: () async {
+      await _closeDataBase();
+      if (reservedFunction != null) {
+        await reservedFunction();
+      }
+    });
   }
 }
